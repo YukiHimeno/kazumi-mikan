@@ -38,7 +38,8 @@ jobs:
       - name: Test native metainfo parsing
         run: cd third_party/flutter_go_torrent_streamer/go && go test metainfo_spec.go metainfo_spec_test.go
       - name: Install pinned Go and app Android NDKs
-        run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'ndk;27.2.12479018' 'ndk;28.2.13676358'
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'ndk;27.2.12479018' 'ndk;28.2.13676358'
       - name: Build patched BT engine
         run: third_party/flutter_go_torrent_streamer/go/build_android.sh
       - name: Build Android arm64 APK
