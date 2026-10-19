@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs><linearGradient id="fruit" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffb24a"/><stop offset=".52" stop-color="#fa812d"/><stop offset="1" stop-color="#e85825"/></linearGradient></defs>
+  <circle cx="512" cy="540" r="328" fill="#f8d89b"/>
+  <circle cx="512" cy="540" r="302" fill="url(#fruit)"/>
+  <circle cx="512" cy="540" r="269" fill="none" stroke="#ffe4af" stroke-width="10" opacity=".8"/>
+  <g stroke="#ffe5ae" stroke-width="12" stroke-linecap="round" opacity=".72"><path d="M512 296v125M325 390l106 77M283 588l131-20M390 775l72-121M639 761l-67-108M750 564l-130-7M690 380l-101 84"/></g>
+  <path d="M512 240c-45-86-129-118-206-79 23 78 99 131 206 115Z" fill="#6ebc72"/>
+  <path d="M500 246c31-75 103-105 170-76-28 76-92 111-164 110Z" fill="#a9d88d"/>
+  <path d="M513 269v-55" stroke="#456b53" stroke-width="21" stroke-linecap="round"/>
+  <circle cx="512" cy="543" r="126" fill="#192840" opacity=".93"/>
+  <path d="M476 469q-4-11 12-3l128 71q13 7 0 15l-128 74q-15 9-12-6Z" fill="#fff7e4"/>
+</svg>

@@ -1,11 +1,11 @@
 {
-    "name": "kazumi",
-    "short_name": "kazumi",
+    "name": "Kazumi Mikan",
+    "short_name": "Mikan",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Android-first Kazumi fork for Mikan RSS and BT streaming.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

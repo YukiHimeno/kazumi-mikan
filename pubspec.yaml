@@ -1,5 +1,5 @@
 name: kazumi
-description: "A new Flutter project."
+description: "Kazumi Mikan: Android-first Mikan RSS and BT streaming fork of Kazumi."
 publish_to: "none"
 version: 2.3.9+20309
 
@@ -127,9 +127,9 @@ flutter_launcher_icons:
   image_path: assets/images/logo/logo_android.png
   image_path_android: assets/images/logo/logo_android.png
   image_path_ios: assets/images/logo/logo_ios.png
-  adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: assets/images/logo/logo_android.png
-  adaptive_icon_monochrome: assets/images/logo/logo_android.png
+  adaptive_icon_background: "#192840"
+  adaptive_icon_foreground: assets/images/logo/mikan_foreground.png
+  adaptive_icon_monochrome: assets/images/logo/mikan_monochrome.png
   macos:
     generate: true
     image_path: assets/images/logo/logo_rounded.png
@@ -148,7 +148,7 @@ flutter_native_splash:
   image_dark_ios: assets/images/logo/logo_ios.png
 
 msix_config:
-  display_name: Kazumi
+  display_name: Kazumi Mikan
   publisher: CN=SignPath Foundation, O=SignPath Foundation, L=Lewes, S=Delaware, C=US
   logo_path: assets/images/logo/logo_rounded.png
   sign_msix: false
