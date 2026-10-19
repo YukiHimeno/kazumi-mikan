@@ -49,6 +49,7 @@ jobs:
           apk=build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           unzip -Z1 "$apk" > "$RUNNER_TEMP/apk-list.txt"
           grep -Fxq 'lib/arm64-v8a/libtorrent_streamer.so' "$RUNNER_TEMP/apk-list.txt"
+          grep -Fxq 'lib/arm64-v8a/libc++_shared.so' "$RUNNER_TEMP/apk-list.txt"
           if grep -q '^lib/armeabi-v7a/' "$RUNNER_TEMP/apk-list.txt"; then
             echo 'Unexpected 32-bit libraries in arm64 APK' >&2
             exit 1

@@ -31,6 +31,10 @@ tasks.matching { it.name == "preBuild" }.configureEach {
             if (!library.isFile()) {
                 throw new GradleException("Patched BT engine missing: ${library}. Run third_party/flutter_go_torrent_streamer/go/build_android.sh first.")
             }
+            def cxxRuntime = file("src/main/jniLibs/${abi}/libc++_shared.so")
+            if (!cxxRuntime.isFile()) {
+                throw new GradleException("Android C++ runtime missing: ${cxxRuntime}. Run third_party/flutter_go_torrent_streamer/go/build_android.sh first.")
+            }
         }
     }
 }
