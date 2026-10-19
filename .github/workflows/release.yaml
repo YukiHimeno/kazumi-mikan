@@ -35,8 +35,11 @@ jobs:
         with:
           go-version: '1.23.6'
           cache-dependency-path: third_party/flutter_go_torrent_streamer/go/go.sum
-      - name: Test native metainfo parsing
-        run: cd third_party/flutter_go_torrent_streamer/go && go test metainfo_spec.go metainfo_spec_test.go
+      - name: Test native metainfo parsing and stream buffering
+        run: |
+          cd third_party/flutter_go_torrent_streamer/go
+          go test metainfo_spec.go metainfo_spec_test.go
+          go test stream_buffer.go stream_buffer_test.go
       - name: Install pinned Go and app Android NDKs
         run: |
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'ndk;27.2.12479018' 'ndk;28.2.13676358'

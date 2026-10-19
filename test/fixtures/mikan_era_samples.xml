@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Selected title/enclosure pairs from public mikanime.tv/RSS/Search feeds for CLANNAD and 葬送的芙莉莲 (2026-08 snapshot). -->
+<!-- Public mikanime.tv/RSS/Search title/enclosure samples for CLANNAD and 葬送的芙莉莲, captured across 2018–2026 feeds. Covers multiple release-label styles; group parsing must rely on structure, not this sample list. -->
 <rss version="2.0"><channel>
   <item><title><![CDATA[[DBD-Raws&澄空学园][CLANNAD AFTER STORY][01-22TV全集+OVA+特别篇+总集篇][1080P][BDRip][HEVC-10bit][简繁字幕外挂][FLAC][MKV]]]></title><enclosure url="https://mikanani.me/Download/20210512/73f5bbf112755cb1c56889f51dde98437c1ac432.torrent"/></item>
   <item><title><![CDATA[[Moozzi2] Clannad After Story (BD 1920x1080 x.264 Flac)]]></title><enclosure url="https://mikanani.me/Download/20200109/7b9c9504a76e7221864a2213fddbeab699f19de5.torrent"/></item>
@@ -9,4 +9,9 @@
   <item><title><![CDATA[[Zzz睡不醒][葬送的芙莉莲 第二季][Sousou no Frieren 2nd Season][01-10][BDRip][1080P][HEVC-10bit][简繁日内封][MKV]]]></title><enclosure url="https://mikanani.me/Download/20260805/1f01b9c6de60857a5ba31a484e583c71956cdf8b.torrent"/></item>
   <item><title><![CDATA[[7³ACG] 葬送的芙莉莲/Sousou no Frieren S01 | 01-28+SPx11 [简繁字幕] BDrip 1080p x265 OPUS 2.0]]></title><enclosure url="https://mikanani.me/Download/20260828/f8651444a2c0b3ff7e3da3cbd75da58ef5f09e19.torrent"/></item>
   <item><title><![CDATA[【喵萌奶茶屋】★01月新番★[葬送的芙莉莲 / Sousou no Frieren][29-38][BDRip][1080p][繁日双语]]]></title><enclosure url="https://mikanani.me/Download/20261017/8e4e8471b226e311eb7b3b77476eec7834052dbd.torrent"/></item>
+  <item><title><![CDATA[[Shiniori-Raws]葬送的芙莉莲 第二季/Sousou no Frieren S2 4k 2160p x265 10bit]]></title><enclosure url="https://mikanani.me/Download/20260822/3532d30205dbc53cdaa7d03285b5cf497258fa7d.torrent"/></item>
+  <item><title><![CDATA[[Xspitfire911] 葬送的芙莉莲/Sousou No Frieren S01 + S02 BDRIP 1080p X265 10bit VOSTFR]]></title><enclosure url="https://mikanani.me/Download/20260822/81e8ddc2cff1f077de8f3fbb48b23a932da0dd92.torrent"/></item>
+  <item><title><![CDATA[[H-Enc] 葬送的芙莉莲 第二季 / Sousou no Frieren 2nd Season (BDRip 1080p HEVC FLAC)]]></title><enclosure url="https://mikanani.me/Download/20260812/f7f11b17b95b00313ededdeb0d2c2057c13309e9.torrent"/></item>
+  <item><title><![CDATA[[ReinForce] 葬送的芙莉莲 S1-S2 / 葬送のフリーレン /Sousou no Frieren (BDRip 1920x1080 x264 FLAC)]]></title><enclosure url="https://mikanani.me/Download/20260806/cb2e5cce0b4fe28f91f8c756d34483d2b3def4d6.torrent"/></item>
+  <item><title><![CDATA[[jibaketa合成][代理商粤语]葬送的芙莉莲 第二季 / Sousou no Frieren 2nd Season - 10 END [粤日双语+内封繁体中文字幕] (WEB 1920x1080 AVC AACx2 SRT MUSE CHT)]]></title><enclosure url="https://mikanani.me/Download/20260605/6749019e7e0560e89b9d69f2838638467f28f6df.torrent"/></item>
 </channel></rss>

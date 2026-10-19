@@ -793,8 +793,17 @@ func (s *StreamerSession) streamHandler(w http.ResponseWriter, r *http.Request) 
 	fileToStream.Download()
 	reader := fileToStream.NewReader()
 	reader.SetResponsive()
+	reader.SetReadahead(8 * 1024 * 1024)
 	defer reader.Close()
 
+	// Warm a small window at the requested playback offset before responding.
+	// The timeout is deliberately bounded so slow/no-peer torrents can still
+	// start streaming instead of waiting forever for a full buffer.
+	if r.Method == http.MethodGet {
+		if offset, ok := streamRangeOffset(r.Header.Get("Range"), fileToStream.Length()); ok && offset == 0 {
+			warmStreamReader(r, reader, offset, fileToStream.Length())
+		}
+	}
 	http.ServeContent(w, r, fileToStream.Path(), time.Now(), reader)
 }
 

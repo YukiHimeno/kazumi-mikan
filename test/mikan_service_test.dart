@@ -40,15 +40,30 @@ void main() {
     );
     final expected = <(String, int?, String?)>[
       ('DBD-Raws&澄空学园', null, '1080P'),
-      ('Moozzi2', null, null),
-      ('影片压制', null, '720P'),
-      ('xyx98', null, null),
+      ('Moozzi2', null, '1080p'),
+      ('影片压制', null, '720p'),
+      ('xyx98', null, '720p'),
       ('绿茶字幕组', 38, '1080p'),
       ('Zzz睡不醒', null, '1080P'),
       ('7³ACG', null, '1080p'),
       ('喵萌奶茶屋', null, '1080p'),
+      ('Shiniori-Raws', null, '4k'),
+      ('Xspitfire911', null, '1080p'),
+      ('H-Enc', null, '1080p'),
+      ('ReinForce', null, '1080p'),
+      ('jibaketa合成', 10, '1080p'),
     ];
     expect(releases, hasLength(expected.length));
+    expect(releases[0].episodeStart, 1);
+    expect(releases[0].episodeEnd, 22);
+    expect(releases[0].videoSource, 'Blu-ray');
+    expect(releases[0].videoCodec, 'H.265/HEVC');
+    expect(releases[0].bitDepth, 10);
+    expect(releases[0].audioCodec, 'FLAC');
+    expect(releases[4].season, 2);
+    expect(releases[5].episodeStart, 1);
+    expect(releases[5].episodeEnd, 10);
+    expect(releases[5].subtitleHint, '简繁日');
     for (var i = 0; i < expected.length; i++) {
       expect(
         releases[i].sourceGroup,
@@ -66,13 +81,51 @@ void main() {
     }
   });
 
+  test('extracts structured release fields across varied title syntax', () {
+    const url = 'https://mikanani.me/Download/sample.torrent';
+    final release = MikanService.parseRss('''<rss><channel><item>
+      <title><![CDATA[[NewCrew] S02E03 [1920x1080] [WEB-DL] [AV1] [10-bit] [AAC] [简繁日内封] [MKV]]]></title>
+      <enclosure url="$url" />
+    </item></channel></rss>''').single;
+    expect(release.sourceGroup, 'NewCrew');
+    expect(release.season, 2);
+    expect(release.episode, 3);
+    expect(release.qualityHint, '1080p');
+    expect(release.videoSource, 'WEB');
+    expect(release.videoCodec, 'AV1');
+    expect(release.bitDepth, 10);
+    expect(release.audioCodec, 'AAC');
+    expect(release.subtitleHint, '简繁日');
+    expect(release.container, 'MKV');
+
+    final batch = MikanService.parseRss('''<rss><channel><item>
+      <title>[RawWorks] 某番剧 S02 [01-12] BDRip x265 10bit FLAC MKV</title>
+      <enclosure url="https://mikanani.me/Download/batch.torrent" />
+    </item></channel></rss>''').single;
+    expect(batch.season, 2);
+    expect(batch.episode, isNull);
+    expect(batch.episodeStart, 1);
+    expect(batch.episodeEnd, 12);
+    expect(batch.matchesEpisode(7), isTrue);
+    expect(batch.matchesEpisode(13), isFalse);
+    expect(batch.videoSource, 'Blu-ray');
+    expect(batch.videoCodec, 'H.265/HEVC');
+    expect(batch.audioCodec, 'FLAC');
+    expect(batch.container, 'MKV');
+
+    expect(MikanService.extractEpisode('Frieren S01 | 01-28+SPx11'), isNull);
+    expect(MikanService.extractEpisode('Series - 10 END'), 10);
+    expect(MikanService.extractQualityHint('1920x1080'), '1080p');
+    expect(MikanService.extractQualityHint('1280X720P'), '720p');
+  });
+
   test('leading metadata, group labels and ambiguous series titles', () {
     final cases = <String, String>{
       '[2024][S02][1080p][WEB-DL][EP03][LoliHouse] 番剧': 'LoliHouse',
       '【动漫国字幕组】【某番剧】【03】': '动漫国字幕组',
       '[VCB-Studio] 番剧 [01-12]': 'VCB-Studio',
       '[Nix-Raws] 番剧 [01]': 'Nix-Raws',
-      '【喵萌奶茶屋】某番剧 第03话': '喵萌奶茶屋',
+      '【喵萌奶茶屋】某番剧 第03话': '未标注来源',
       '[NewSub] 番剧 [03]': 'NewSub',
       '[2024][720p][HEVC] 番剧 [03]': '未标注来源',
       '[葬送的芙莉莲][03][1080p]': '未标注来源',
