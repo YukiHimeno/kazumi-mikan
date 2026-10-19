@@ -1,6 +1,6 @@
 name: Android release build
 
-on:
+'on':
   push:
     tags: ['v*']
   workflow_dispatch:
