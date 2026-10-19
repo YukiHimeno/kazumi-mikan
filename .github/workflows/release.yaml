@@ -32,6 +32,15 @@ jobs:
         run: flutter pub get
       - name: Build Android arm64 APK
         run: flutter build apk --release --target-platform android-arm64 --split-per-abi
+      - name: Verify arm64 BT engine is packaged
+        run: |
+          apk=build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          unzip -Z1 "$apk" > "$RUNNER_TEMP/apk-list.txt"
+          grep -Fxq 'lib/arm64-v8a/libtorrent_streamer.so' "$RUNNER_TEMP/apk-list.txt"
+          if grep -q '^lib/armeabi-v7a/' "$RUNNER_TEMP/apk-list.txt"; then
+            echo 'Unexpected 32-bit libraries in arm64 APK' >&2
+            exit 1
+          fi
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
