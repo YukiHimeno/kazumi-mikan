@@ -28,6 +28,9 @@ for target in arm64-v8a:arm64:aarch64 x86_64:amd64:x86_64; do
   }
   env GOOS=android GOARCH="$arch" CGO_ENABLED=1 CC="$cc" CXX="$cxx" \
     go build -x -trimpath -buildmode=c-shared -o "$out/$abi/libtorrent_streamer.so" .
-  "$bin/llvm-nm" -D "$out/$abi/libtorrent_streamer.so" | grep -Eq ' [T] StartStream$'
-  "$bin/llvm-nm" -D "$out/$abi/libtorrent_streamer.so" | grep -Eq ' [T] GetStreamStatus$'
+  symbols=$(mktemp)
+  "$bin/llvm-nm" -D "$out/$abi/libtorrent_streamer.so" > "$symbols"
+  grep -Eq ' [T] StartStream$' "$symbols"
+  grep -Eq ' [T] GetStreamStatus$' "$symbols"
+  rm -f "$symbols"
 done
