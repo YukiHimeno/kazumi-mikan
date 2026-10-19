@@ -20,7 +20,9 @@ cd "$script_dir"
 for target in arm64-v8a:arm64:aarch64 x86_64:amd64:x86_64; do
   IFS=: read -r abi arch triple <<< "$target"
   mkdir -p "$out/$abi"
-  env GOOS=android GOARCH="$arch" CGO_ENABLED=1 CC="$bin/${triple}-linux-android21-clang" \
+  env GOOS=android GOARCH="$arch" CGO_ENABLED=1 \
+    CC="$bin/${triple}-linux-android21-clang" \
+    CXX="$bin/${triple}-linux-android21-clang++" \
     go build -trimpath -buildmode=c-shared -o "$out/$abi/libtorrent_streamer.so" .
   "$bin/llvm-nm" -D "$out/$abi/libtorrent_streamer.so" | grep -Eq ' [T] StartStream$'
   "$bin/llvm-nm" -D "$out/$abi/libtorrent_streamer.so" | grep -Eq ' [T] GetStreamStatus$'
