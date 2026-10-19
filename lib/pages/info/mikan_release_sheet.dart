@@ -67,6 +67,7 @@ class _MikanReleaseSheetState extends State<MikanReleaseSheet> {
         titles: [_releases[index].title],
         torrentUrls: [_releases[index].torrentUrl.toString()],
         selectedIndex: 0,
+        sourceGroup: _releases[index].sourceGroup,
       ),
     );
   }
@@ -107,6 +108,12 @@ class _MikanReleaseSheetState extends State<MikanReleaseSheet> {
               itemCount: _releases.length,
               itemBuilder: (context, index) {
                 final release = _releases[index];
+                final episodeHint = release.episode == null
+                    ? '集数未确认'
+                    : '可能是第 ${release.episode} 集';
+                final qualityHint = release.qualityHint == null
+                    ? ''
+                    : ' · ${release.qualityHint}';
                 return ListTile(
                   title: Text(
                     release.title,
@@ -114,9 +121,7 @@ class _MikanReleaseSheetState extends State<MikanReleaseSheet> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Text(
-                    release.episode == null
-                        ? '请确认集数和版本'
-                        : '可能是第 ${release.episode} 集 · 请确认版本',
+                    '${release.sourceGroup} · $episodeHint$qualityHint · 请确认版本',
                   ),
                   trailing: const Icon(Icons.play_arrow),
                   onTap: () => _play(index),

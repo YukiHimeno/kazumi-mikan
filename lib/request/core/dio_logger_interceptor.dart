@@ -30,7 +30,9 @@ class DioLoggerInterceptor extends Interceptor {
     KazumiLogger().w(
       'HTTP: <-- $status ${err.requestOptions.method} ${err.requestOptions.uri}'
       '${elapsed == null ? '' : ' ${elapsed}ms'}',
-      error: err.message,
+      error: err.requestOptions.extra['bangumiRequiresAuth'] == true
+          ? null
+          : err.message,
     );
     handler.next(err);
   }

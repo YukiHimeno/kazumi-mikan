@@ -126,6 +126,9 @@ class AutoUpdater {
   }
 
   Future<UpdateInfo?> checkForUpdates() async {
+    if (Platform.isAndroid) {
+      throw UnsupportedError('Kazumi Mikan 暂无 Android 版本发布，不能使用原版更新源');
+    }
     try {
       final data = await _latestRelease();
 
@@ -168,6 +171,7 @@ class AutoUpdater {
   }
 
   Future<void> autoCheckForUpdates() async {
+    if (Platform.isAndroid) return;
     final autoUpdate = GStorage.getSetting(SettingsKeys.autoUpdate);
     if (!autoUpdate) return;
 
@@ -182,6 +186,10 @@ class AutoUpdater {
   }
 
   Future<void> manualCheckForUpdates() async {
+    if (Platform.isAndroid) {
+      KazumiDialog.showToast(message: 'Android 应用内更新已停用；请关注 Kazumi Mikan 项目仓库');
+      return;
+    }
     try {
       final updateInfo = await checkForUpdates();
       if (updateInfo != null) {

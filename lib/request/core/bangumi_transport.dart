@@ -17,7 +17,9 @@ class BangumiAccelerationInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     options.extra.remove(_echRequestKey);
     final uri = options.uri;
-    if (ApiEndpoints.bangumiPublicApiHosts.contains(uri.host)) {
+    // Never route PAT requests through the public API mirror.
+    if (options.extra['bangumiRequiresAuth'] != true &&
+        ApiEndpoints.bangumiPublicApiHosts.contains(uri.host)) {
       switch (BangumiAcceleration.current) {
         case BangumiAcceleration.direct:
           break;

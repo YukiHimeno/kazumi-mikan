@@ -34,6 +34,9 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Built from the vendored Go source before Android packaging
+/third_party/flutter_go_torrent_streamer/android/src/main/jniLibs/
+
 # Symbolication related
 app.*.symbols
 

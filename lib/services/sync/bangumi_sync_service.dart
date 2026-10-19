@@ -75,7 +75,7 @@ class BangumiSyncService extends ChangeNotifier {
       _verifiedToken = null;
       _username = '';
       _lastError = describeError(e);
-      KazumiLogger().w('Bangumi: connection failed', error: e);
+      KazumiLogger().w('Bangumi: connection failed: $_lastError');
       rethrow;
     } finally {
       _isConnecting = false;
@@ -115,17 +115,17 @@ class BangumiSyncService extends ChangeNotifier {
         case 401:
           return 'Access Token 无效或已过期，请在「Bangumi 账号」中更换';
         case 403:
-          return 'Bangumi 拒绝访问，请检查 Token 权限或稍后重试';
+          return 'Bangumi 拒绝访问（403），请检查 Access Token 权限或账号是否有操作权限';
         case 429:
-          return 'Bangumi 请求过于频繁，请稍后重试';
+          return 'Bangumi 请求过于频繁（429），请稍后重试';
       }
       if (error.statusCode != null) {
         return 'Bangumi 服务请求失败（HTTP ${error.statusCode}），请稍后重试';
       }
-      return error.message;
+      return '无法连接 Bangumi 官方 API，请检查网络或稍后重试';
     }
     if (error is FormatException || error is TypeError) {
-      return 'Bangumi 返回的用户信息格式异常，请稍后重试';
+      return 'Bangumi 官方 API 返回的数据格式异常，请稍后重试';
     }
     if (error is StateError) return error.message.toString();
     return 'Bangumi 操作失败，请稍后重试';
@@ -238,7 +238,7 @@ class BangumiSyncService extends ChangeNotifier {
         }
         onProgress?.call('Bangumi 状态同步完成', 1, 1);
       } catch (e) {
-        KazumiLogger().e('Bangumi sync failed', error: e);
+        KazumiLogger().e('Bangumi sync failed: ${describeError(e)}');
         rethrow;
       }
     });

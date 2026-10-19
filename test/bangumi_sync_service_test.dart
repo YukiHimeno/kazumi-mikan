@@ -9,6 +9,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:kazumi/pages/collect/collect_controller.dart';
 import 'package:kazumi/repositories/collect_crud_repository.dart';
 import 'package:kazumi/request/clients/bangumi_client.dart';
+import 'package:kazumi/request/config/api_endpoints.dart';
 import 'package:kazumi/request/core/dio_factory.dart';
 import 'package:kazumi/request/core/network_exception.dart';
 import 'package:kazumi/services/storage/storage.dart';
@@ -65,7 +66,8 @@ void main() {
     expect(GStorage.getSetting(SettingsKeys.bangumiSyncEnable), isTrue);
     expect(bangumi.initialized, isFalse);
     expect(bangumi.isConnecting, isFalse);
-    expect(bangumi.lastError, contains('超时'));
+    expect(bangumi.lastError, contains('无法连接 Bangumi 官方 API'));
+    expect(bangumi.lastError, isNot(contains('saved-token')));
 
     adapter.respond = (_) async => _user();
     await bangumi.ping();
@@ -80,6 +82,46 @@ void main() {
     expect(
         adapter.requests.single.headers['Authorization'], 'Bearer saved-token');
     expect(GStorage.getSetting(SettingsKeys.bangumiSyncEnable), isTrue);
+  });
+
+  test('PAT validation and sync use the official API even in mirror mode', () async {
+    await GStorage.putSetting(SettingsKeys.enableBangumiProxy, true);
+    adapter.respond = (request) async => request.uri.path == '/v0/me'
+        ? _user()
+        : request.method == 'POST'
+            ? _json({})
+            : _json({'data': [], 'total': 0, 'limit': 50});
+    await bangumi.saveToken('draft-token');
+    await bangumi.syncCollectibles();
+    expect(adapter.requests.map((request) => request.uri.host).toSet(),
+        {'api.bgm.tv'});
+    expect(adapter.requests.map((request) => request.uri.path),
+        containsAll(['/v0/me', '/v0/users/saved-user/collections']));
+    expect(adapter.requests.first.headers['Authorization'], 'Bearer draft-token');
+    expect(adapter.requests.every((request) =>
+        request.headers['Authorization'] == 'Bearer draft-token'), isTrue);
+    expect(adapter.requests.every((request) => !request.followRedirects), isTrue);
+    expect(ApiEndpoints.bangumiPatUrl, 'https://next.bgm.tv/demo/access-token');
+    expect(ApiEndpoints.bangumiAuthDocsUrl, contains('How-to-Auth.md'));
+  });
+
+  test('authenticated writes never go through the mirror', () async {
+    await GStorage.putSetting(SettingsKeys.enableBangumiProxy, true);
+    await bangumi.ping();
+    await bangumi.syncCollectibleWhenIdle(123, 1);
+    expect(adapter.requests.last.uri.host, 'api.bgm.tv');
+    expect(adapter.requests.last.method, 'POST');
+    expect(adapter.requests.last.headers['Authorization'], 'Bearer saved-token');
+  });
+
+  test('public requests do not carry the saved PAT; auth refuses other hosts', () async {
+    await BangumiClient.instance.get('https://api.bgm.tv/v0/subjects/1');
+    expect(adapter.requests.single.headers.containsKey('Authorization'), isFalse);
+    await expectLater(
+      BangumiClient.instance.get('https://api.bgmapi.com/v0/me', requiresAuth: true),
+      throwsArgumentError,
+    );
+    expect(adapter.requests, hasLength(1));
   });
 
   test('ECH image acceleration preserves Bangumi API mirror routing', () async {
@@ -132,8 +174,7 @@ void main() {
     await started.future;
     expect(GStorage.getSetting(SettingsKeys.bangumiAccessToken), 'saved-token');
     await BangumiClient.instance.get('https://api.bgm.tv/v0/subjects/1');
-    expect(
-        adapter.requests.last.headers['Authorization'], 'Bearer saved-token');
+    expect(adapter.requests.last.headers.containsKey('Authorization'), isFalse);
     response.complete(_user('replacement-user'));
     await saving;
     expect(GStorage.getSetting(SettingsKeys.bangumiAccessToken),
@@ -178,12 +219,32 @@ void main() {
           bangumi.lastError,
           contains(switch (status) {
             401 => '无效或已过期',
-            403 => '拒绝访问',
-            429 => '请求过于频繁',
+            403 => '权限',
+            429 => '429',
             _ => 'HTTP 503',
           }));
     });
   }
+
+  test('write auth, rate-limit and server errors stay distinguishable', () async {
+    await bangumi.ping();
+    for (final status in [401, 403, 429, 503]) {
+      adapter.respond = (request) async => request.method == 'POST'
+          ? _json({}, status: status)
+          : _user();
+      await expectLater(bangumi.syncCollectibleWhenIdle(123, 1),
+          throwsA(isA<NetworkException>().having((e) => e.statusCode, 'status', status)));
+      expect(BangumiSyncService.describeError(
+          NetworkException(type: NetworkExceptionType.badResponse,
+              message: '', statusCode: status)),
+          contains(switch (status) {
+            401 => '无效',
+            403 => '权限',
+            429 => '429',
+            _ => 'HTTP 503',
+          }));
+    }
+  });
 
   test('malformed user response does not enable sync', () async {
     await GStorage.putSetting(SettingsKeys.bangumiSyncEnable, false);

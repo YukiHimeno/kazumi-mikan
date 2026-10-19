@@ -174,10 +174,15 @@ abstract class _VideoPageController with Store implements Disposable {
             : bangumiItem.name;
         src = 'mikan';
         roadList.clear();
+        // A release selection is a single video, never an episode road.
         roadList.add(
-          Road(name: '蜜柑发布', data: args.torrentUrls, identifier: args.titles),
+          Road(
+            name: args.sourceGroup,
+            data: [args.torrentUrls[args.selectedIndex]],
+            identifier: [args.titles[args.selectedIndex]],
+          ),
         );
-        resetEpisodeState(episode: args.selectedIndex + 1);
+        resetEpisodeState(episode: 1);
       case OnlineVideoPlaybackArgs():
         bangumiItem = args.bangumiItem;
         currentPlugin = args.plugin;

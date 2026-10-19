@@ -18,6 +18,8 @@ void main() {
       'https://mikanani.me/Download/20240101/aaa.torrent',
     );
     expect(releases[0].episode, 3);
+    expect(releases[0].sourceGroup, '字幕组');
+    expect(releases[0].qualityHint, '1080p');
     expect(releases[1].title, '[字幕组] 葬送的芙莉莲 [01-12] BDRip 1080p');
     expect(releases[1].episode, isNull);
   });
@@ -30,6 +32,74 @@ void main() {
     expect(MikanService.extractEpisode('EP01-02'), isNull);
     expect(MikanService.extractEpisode('[01][02]'), isNull);
     expect(MikanService.extractEpisode('BDRip 1080p 2024'), isNull);
+  });
+
+  test('classifies old and modern public RSS release examples', () {
+    final releases = MikanService.parseRss(
+      File('test/fixtures/mikan_era_samples.xml').readAsStringSync(),
+    );
+    final expected = <(String, int?, String?)>[
+      ('DBD-Raws&澄空学园', null, '1080P'),
+      ('Moozzi2', null, null),
+      ('影片压制', null, '720P'),
+      ('xyx98', null, null),
+      ('绿茶字幕组', 38, '1080p'),
+      ('Zzz睡不醒', null, '1080P'),
+      ('7³ACG', null, '1080p'),
+      ('喵萌奶茶屋', null, '1080p'),
+    ];
+    expect(releases, hasLength(expected.length));
+    for (var i = 0; i < expected.length; i++) {
+      expect(
+        releases[i].sourceGroup,
+        expected[i].$1,
+        reason: releases[i].title,
+      );
+      expect(releases[i].episode, expected[i].$2, reason: releases[i].title);
+      expect(
+        releases[i].qualityHint,
+        expected[i].$3,
+        reason: releases[i].title,
+      );
+      expect(releases[i].title, isNotEmpty);
+      expect(releases[i].torrentUrl.path, endsWith('.torrent'));
+    }
+  });
+
+  test('leading metadata, group labels and ambiguous series titles', () {
+    final cases = <String, String>{
+      '[2024][S02][1080p][WEB-DL][EP03][LoliHouse] 番剧': 'LoliHouse',
+      '【动漫国字幕组】【某番剧】【03】': '动漫国字幕组',
+      '[VCB-Studio] 番剧 [01-12]': 'VCB-Studio',
+      '[Nix-Raws] 番剧 [01]': 'Nix-Raws',
+      '【喵萌奶茶屋】某番剧 第03话': '喵萌奶茶屋',
+      '[NewSub] 番剧 [03]': 'NewSub',
+      '[2024][720p][HEVC] 番剧 [03]': '未标注来源',
+      '[葬送的芙莉莲][03][1080p]': '未标注来源',
+      '[Naruto][03][1080p]': '未标注来源',
+      '[Naruto] 第03话 [1080p]': '未标注来源',
+      '[Unknown] 番剧 EP03': '未标注来源',
+      '[01][1080p]': '未标注来源',
+      '无标签标题 第01话': '未标注来源',
+    };
+    for (final entry in cases.entries) {
+      expect(
+        MikanService.extractSourceGroup(entry.key),
+        entry.value,
+        reason: entry.key,
+      );
+    }
+    expect(MikanService.extractEpisode('剧场版 番剧 [01]'), isNull);
+    expect(MikanService.extractEpisode('番剧 合集 EP01'), isNull);
+    expect(MikanService.extractEpisode('番剧 [01-12] EP01'), isNull);
+    expect(
+      MikanRelease(
+        title: '无标签标题',
+        torrentUrl: Uri.parse('https://mikanani.me/Download/1.torrent'),
+        episode: null,
+      ).sourceGroup,
+      MikanService.unknownSourceGroup,
+    );
   });
 
   test('rejects DTDs, malformed and non-RSS XML', () {

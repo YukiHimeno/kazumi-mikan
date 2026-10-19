@@ -8,10 +8,13 @@ class ApiEndpoints {
   static const int apiLevel = 9;
 
   /// 项目主页
-  static const String projectUrl = "https://kazumi.app/";
+  static const String projectUrl = "https://github.com/YukiHimeno/kazumi-mikan";
 
   /// Github 项目主页
-  static const String sourceUrl = "https://github.com/Predidit/Kazumi";
+  static const String sourceUrl = projectUrl;
+
+  /// 原版项目（仅用于署名）
+  static const String upstreamUrl = "https://github.com/Predidit/Kazumi";
 
   /// 图标作者
   static const String iconUrl = "https://www.pixiv.net/users/66219277";
@@ -24,14 +27,14 @@ class ApiEndpoints {
   static const String pluginShopMirror =
       'https://raw.gitcode.com/gh_mirrors/ka/KazumiRules/raw/main/';
 
-  /// 在线升级
+  /// 原版更新源；仅供非 Android 平台沿用，不能用于本 fork 的 Android 安装。
   static const String latestApp =
       'https://api.github.com/repos/Predidit/Kazumi/releases/latest';
 
   /// Bangumi 镜像测试后端
   static const String bangumiMirrorDomain = 'https://api.kazumi.fyi';
 
-  /// Kazumi 镜像后端应用更新
+  /// 原版镜像更新源；Android 禁止读取。
   static const String latestAppMirror =
       '$bangumiMirrorDomain/kazumi/v1/app/latest';
 
@@ -44,11 +47,10 @@ class ApiEndpoints {
   /// bangumi API
   static const String bangumiAPIDomain = 'https://api.bgm.tv';
 
-  /// Bangumi 鉴权 API
-  static const String bangumiAuthAPIMirrorDomain = 'https://api.bgmapi.com';
-
-  /// Telegram 群组
-  static const String telegramGroup = 'https://t.me/kazumi_app';
+  /// 官方个人 Access Token 生成页及授权说明
+  static const String bangumiPatUrl = 'https://next.bgm.tv/demo/access-token';
+  static const String bangumiAuthDocsUrl =
+      'https://github.com/bangumi/api/blob/master/docs-raw/How-to-Auth.md';
 
   /// 番剧信息
   static const String bangumiInfoByID = '/v0/subjects/{0}';

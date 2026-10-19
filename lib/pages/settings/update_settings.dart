@@ -21,36 +21,43 @@ class _UpdateSettingsPageState extends State<UpdateSettingsPage> {
   @override
   Widget build(BuildContext context) => SettingsDetailScaffold(
         title: const Text('更新设置'),
-        body: SettingsList(
-          sections: [
-            SettingsSection(
-              title: const Text('启动时检查更新'),
-              tiles: [
-                SettingsTile.switchTile(
-                  leading: Icons.update_rounded,
-                  title: const Text('应用更新'),
-                  initialValue: _autoUpdate,
-                  onToggle: (value) {
-                    setState(() => _autoUpdate = value ?? !_autoUpdate);
-                    GStorage.putSetting(SettingsKeys.autoUpdate, _autoUpdate);
-                  },
-                ),
-                if (!Platform.isAndroid)
-                  SettingsTile.switchTile(
-                  leading: Icons.extension_rounded,
-                  title: const Text('规则更新'),
-                  initialValue: _pluginUpdate,
-                  onToggle: (value) {
-                    setState(() => _pluginUpdate = value ?? !_pluginUpdate);
-                    GStorage.putSetting(
-                      SettingsKeys.checkPluginUpdateOnStartup,
-                      _pluginUpdate,
-                    );
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+        body: Platform.isAndroid
+            ? const Padding(
+                padding: EdgeInsets.all(24),
+                child: Text('Kazumi Mikan 暂无独立版本发布。为避免安装原版 Kazumi，Android 应用内更新已停用。'),
+              )
+            : SettingsList(
+                sections: [
+                  SettingsSection(
+                    title: const Text('启动时检查更新'),
+                    tiles: [
+                      SettingsTile.switchTile(
+                        leading: Icons.update_rounded,
+                        title: const Text('应用更新'),
+                        initialValue: _autoUpdate,
+                        onToggle: (value) {
+                          setState(() => _autoUpdate = value ?? !_autoUpdate);
+                          GStorage.putSetting(
+                            SettingsKeys.autoUpdate,
+                            _autoUpdate,
+                          );
+                        },
+                      ),
+                      SettingsTile.switchTile(
+                        leading: Icons.extension_rounded,
+                        title: const Text('规则更新'),
+                        initialValue: _pluginUpdate,
+                        onToggle: (value) {
+                          setState(() => _pluginUpdate = value ?? !_pluginUpdate);
+                          GStorage.putSetting(
+                            SettingsKeys.checkPluginUpdateOnStartup,
+                            _pluginUpdate,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
       );
 }

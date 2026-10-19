@@ -81,6 +81,17 @@ jobs:
           flutter-version-file: pubspec.yaml
       - name: Get dependencies
         run: flutter pub get
+      - name: Set up Go 1.23.6
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.6'
+          cache-dependency-path: third_party/flutter_go_torrent_streamer/go/go.sum
+      - name: Test native metainfo parsing
+        run: cd third_party/flutter_go_torrent_streamer/go && go test metainfo_spec.go metainfo_spec_test.go
+      - name: Install pinned Go and app Android NDKs
+        run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'ndk;27.2.12479018' 'ndk;28.2.13676358'
+      - name: Build patched BT engine
+        run: third_party/flutter_go_torrent_streamer/go/build_android.sh
       - name: Build Android arm64 APK
         run: flutter build apk --release --target-platform android-arm64 --split-per-abi
       - name: Verify arm64 BT engine is packaged

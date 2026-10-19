@@ -12,7 +12,7 @@
 
 1. 在番剧详情页点击「开始观看」，按作品名搜索蜜柑计划 RSS；可以修改关键词。
 2. 手动确认字幕组、集数、清晰度，选择一个 BT 发布版本。
-3. 应用获取种子元数据，连接 BT 对等节点，通过仅供本机访问的 HTTP 流交给 Kazumi 播放器；播放与进度拖动都留在应用内。
+3. 应用把 `.torrent` 原始元数据交给原生 BT 引擎（不再重新向节点索取元数据），连接 BT 对等节点，通过仅供本机访问的 HTTP 流交给 Kazumi 播放器；播放与进度拖动都留在应用内。发布线路展示识别到的字幕组或发布来源，未识别的明确标注。
 
 安卓播放**不需要安装规则**。包名为 `io.github.yukihimeno.kazumimikan`，与原版 Kazumi 分开安装。引擎当前只提供 arm64-v8a 和 x86_64 原生库，无法在 32 位安卓上运行。
 
@@ -20,11 +20,11 @@
 
 ## 构建与 CI
 
-- Flutter 版本见 `pubspec.yaml`（目前 3.47.7），Android 构建需要 JDK 17、Android SDK，以及 `clang`/CMake/Ninja 等原生工具。
-- 本地执行：`flutter pub get && flutter test && flutter analyze --no-fatal-infos --fatal-warnings && flutter build apk --release --target-platform android-arm64 --split-per-abi`。
+- Flutter 版本见 `pubspec.yaml`（目前 3.47.7）。Android 构建另需 JDK 17、Android SDK/NDK 27.2.12479018、Go 1.23.6、`clang`/CMake/Ninja 等原生工具。
+- 本地执行：`flutter pub get && flutter test && flutter analyze --no-fatal-infos --fatal-warnings && third_party/flutter_go_torrent_streamer/go/build_android.sh && flutter build apk --release --target-platform android-arm64 --split-per-abi`。
 - 推送到 `main`、提交 PR 或手动运行 **Android CI** 会检查代码并上传 arm64 APK 构建产物；该 APK 暂用 Flutter 模板中的**调试签名**，不应用于正式发布。Tag/手动的 **Android release build** 仅上传构建产物，不会自动发布 Release。
 
-更多设计、范围与已知限制见 [MIKAN_ANDROID.md](MIKAN_ANDROID.md)。非安卓平台仍保留上游的规则播放代码，尚未完成独立迁移；Dart 内部包名仍为 `kazumi`，避免大范围导入路径改写。
+Bangumi 收藏同步可在应用内「设置 → 同步备份 → Bangumi」按[官方教程](https://github.com/bangumi/api/blob/master/docs-raw/How-to-Auth.md)使用自己生成的 Access Token；公开 Bangumi API 故障并不等同于令牌失效。更多设计、范围与已知限制见 [MIKAN_ANDROID.md](MIKAN_ANDROID.md)。非安卓平台仍保留上游的规则播放代码，尚未完成独立迁移；Dart 内部包名仍为 `kazumi`，避免大范围导入路径改写。
 
 ## 来源与许可
 

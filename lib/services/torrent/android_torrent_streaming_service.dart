@@ -5,7 +5,11 @@ import 'package:flutter_go_torrent_streamer/flutter_go_torrent_streamer.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-import 'torrent_magnet.dart';
+String torrentSessionError(Map<String, dynamic> status) {
+  final detail = status['error'];
+  return 'Torrent session failed: ${status['state']}'
+      '${detail is String && detail.isNotEmpty ? ': $detail' : ''}';
+}
 
 /// One active Android streaming session at a time. Call stop when playback ends.
 class AndroidTorrentStreamingService {
@@ -29,9 +33,8 @@ class AndroidTorrentStreamingService {
       await _stopActive();
       _checkCurrent(generation);
       try {
-        final magnet = torrentUrl.startsWith('magnet:?')
-            ? torrentUrl
-            : torrentToMagnet(await _fetchTorrent(torrentUrl));
+        final isMagnet = torrentUrl.startsWith('magnet:?');
+        final metainfo = isMagnet ? null : await _fetchTorrent(torrentUrl);
         _checkCurrent(generation);
         final cacheRoot = Directory(
           '${(await getApplicationSupportDirectory()).path}/torrent_streams',
@@ -41,7 +44,9 @@ class AndroidTorrentStreamingService {
         final directory = await cacheRoot.createTemp('session_');
         _directory = directory;
         _checkCurrent(generation);
-        final session = await _streamer.startStream(magnet, directory.path);
+        final session = isMagnet
+            ? await _streamer.startStream(torrentUrl, directory.path)
+            : await _streamer.startStreamTorrent(metainfo!, directory.path);
         _session = session;
         _checkCurrent(generation);
 
@@ -52,7 +57,7 @@ class AndroidTorrentStreamingService {
           _checkCurrent(generation);
           final state = status['state'];
           if (state == 'Error' || state == 'Stopped' || state == 'NotFound') {
-            throw StateError('Torrent session failed: $state');
+            throw StateError(torrentSessionError(status));
           }
           if (state == 'Ready' ||
               state == 'Downloading' ||

@@ -34,11 +34,13 @@ class MikanVideoPlaybackArgs extends VideoPlaybackArgs {
     required this.titles,
     required this.torrentUrls,
     required this.selectedIndex,
+    required this.sourceGroup,
   });
 
   final List<String> titles;
   final List<String> torrentUrls;
   final int selectedIndex;
+  final String sourceGroup;
 }
 
 class OfflineVideoPlaybackArgs extends VideoPlaybackArgs {

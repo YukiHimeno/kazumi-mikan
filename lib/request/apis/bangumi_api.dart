@@ -523,21 +523,13 @@ class BangumiApi {
   }
 
   static Future<User?> getCurrentUser({String? accessToken}) async {
-    try {
-      final jsonData = await _client.get(
-        ApiEndpoints.formatUrl(
-            ApiEndpoints.bangumiAuthAPIMirrorDomain +
-                ApiEndpoints.bangumiUsernameByToken,
-            []),
-        requiresAuth: true,
-        accessToken: accessToken,
-      );
-      if (jsonData['id'] != null) {
-        return User.fromJson(Map<String, dynamic>.from(jsonData));
-      }
-    } catch (e) {
-      KazumiLogger().e('Network: get current user failed', error: e);
-      rethrow;
+    final jsonData = await _client.get(
+      ApiEndpoints.bangumiAPIDomain + ApiEndpoints.bangumiUsernameByToken,
+      requiresAuth: true,
+      accessToken: accessToken,
+    );
+    if (jsonData['id'] != null) {
+      return User.fromJson(Map<String, dynamic>.from(jsonData));
     }
     return null;
   }
@@ -566,7 +558,7 @@ class BangumiApi {
       Future<Map> fetchPageData(int offset, int pageLimit) async {
         await rateLimiter.acquire();
         final url = ApiEndpoints.formatUrl(
-            ApiEndpoints.bangumiAuthAPIMirrorDomain +
+            ApiEndpoints.bangumiAPIDomain +
                 ApiEndpoints.bangumiGetAllCollections,
             [username, pageLimit, offset]);
         final jsonData = await _client.get(
@@ -593,10 +585,7 @@ class BangumiApi {
                 items.add(collection);
               }
             } catch (e) {
-              KazumiLogger().e(
-                'BangumiApi: parse collection item failed: ${e.toString()}',
-                error: e,
-              );
+              KazumiLogger().e('BangumiApi: parse collection item failed');
               failedItemCount++;
             }
           }
@@ -694,8 +683,8 @@ class BangumiApi {
           }
         }
       }
-    } catch (e) {
-      KazumiLogger().e('Network: get bangumi collection failed', error: e);
+    } catch (_) {
+      KazumiLogger().e('Bangumi collection request failed');
       rethrow;
     }
     KazumiLogger()
@@ -710,7 +699,7 @@ class BangumiApi {
     try {
       await _client.post(
         ApiEndpoints.formatUrl(
-            ApiEndpoints.bangumiAuthAPIMirrorDomain +
+            ApiEndpoints.bangumiAPIDomain +
                 ApiEndpoints.bangumiSetCollection,
             [id]),
         data: data,
@@ -719,24 +708,24 @@ class BangumiApi {
       KazumiLogger().d('Update to Bangumi: Id: $id');
       return true;
     } on NetworkException catch (e) {
+      if (e.statusCode != 400 && e.statusCode != 404) {
+        rethrow;
+      }
       String str;
       switch (e.statusCode) {
         case 400:
           str = 'Validation Error 验证错误';
           break;
-        case 401:
-          str = 'Unauthorized 未经授权';
-          break;
         case 404:
           str = 'User not found 用户不存在';
           break;
         default:
-          str = 'Error $e';
+          str = 'HTTP ${e.statusCode}';
       }
-      KazumiLogger().e('BangumiApi: $str', error: e);
+      KazumiLogger().e('BangumiApi: $str');
       return false;
-    } catch (e) {
-      KazumiLogger().e('Network: update bangumi collection failed', error: e);
+    } catch (_) {
+      KazumiLogger().e('Bangumi collection update failed');
       rethrow;
     }
   }

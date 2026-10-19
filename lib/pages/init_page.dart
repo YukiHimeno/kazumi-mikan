@@ -86,7 +86,8 @@ class _InitPageState extends State<InitPage> {
 
     final updateController = myController;
     unawaited(runStartupUpdateCheck(
-      isEnabled: () => GStorage.getSetting(SettingsKeys.autoUpdate),
+      isEnabled: () =>
+          !Platform.isAndroid && GStorage.getSetting(SettingsKeys.autoUpdate),
       checkForUpdate: () => updateController.checkUpdate(type: 'auto'),
     ));
     context.navigate(GStorage.getSetting(SettingsKeys.defaultStartupPage));

@@ -11,11 +11,15 @@ class MikanRelease {
     required this.title,
     required this.torrentUrl,
     required this.episode,
+    this.sourceGroup = MikanService.unknownSourceGroup,
+    this.qualityHint,
   });
 
   final String title;
   final Uri torrentUrl;
   final int? episode;
+  final String sourceGroup;
+  final String? qualityHint;
 }
 
 class MikanService {
@@ -23,6 +27,7 @@ class MikanService {
 
   final http.Client _client;
   static const int _maxFeedBytes = 5 * 1024 * 1024;
+  static const String unknownSourceGroup = '未标注来源';
 
   /// Fetches Mikan's RSS search results. Throws on HTTP errors or invalid XML.
   /// Call [close] when finished; an injected client is also closed.
@@ -90,6 +95,8 @@ class MikanService {
           title: title,
           torrentUrl: url,
           episode: extractEpisode(title),
+          sourceGroup: extractSourceGroup(title),
+          qualityHint: extractQualityHint(title),
         ),
       );
     }
@@ -103,10 +110,104 @@ class MikanService {
     return value.isEmpty ? null : value;
   }
 
+  /// Only leading bracket labels can be sources. Unfamiliar Chinese labels
+  /// without a fansub suffix are too easily confused with a series name.
+  static String extractSourceGroup(String title) {
+    var rest = title.trimLeft();
+    final bracket = RegExp(
+      r'^(?:\[([^\]]{1,60})\]|【([^】]{1,60})】|\(([^)]{1,60})\)|（([^）]{1,60})）)',
+    );
+    while (true) {
+      final match = bracket.firstMatch(rest);
+      if (match == null) return unknownSourceGroup;
+      final label =
+          (match.group(1) ??
+                  match.group(2) ??
+                  match.group(3) ??
+                  match.group(4)!)
+              .trim();
+      rest = rest.substring(match.end).trimLeft();
+      if (_isReleaseTag(label)) continue;
+      if (_isGroupLabel(label) && rest.isNotEmpty) {
+        final nextBracket = bracket.firstMatch(rest);
+        if (nextBracket != null &&
+            _isReleaseTag(
+              (nextBracket.group(1) ??
+                      nextBracket.group(2) ??
+                      nextBracket.group(3) ??
+                      nextBracket.group(4)!)
+                  .trim(),
+            ) &&
+            !_knownGroups.contains(label.toLowerCase()) &&
+            !RegExp(
+              r'(字幕组|汉化组|製作組|制作组|压制组|压制|合成)$',
+            ).hasMatch(label)) {
+          return unknownSourceGroup;
+        }
+        return label;
+      }
+      return unknownSourceGroup;
+    }
+  }
+
+  static const _knownGroups = {
+    'lolihouse',
+    'vcb-studio',
+    'nix-raws',
+    '喵萌奶茶屋',
+  };
+
+  static bool _isReleaseTag(String label) {
+    return RegExp(
+      r'^(?:\d{2,4}(?:年(?:\d{1,2}月)?)?|\d{1,2}月新番|S(?:eason)?\s*\d{1,2}|第\s*\d+\s*季|'
+      r'(?:EP?|Episode)\s*[. #_-]*\d+(?:v\d+)?|第\s*\d+\s*[集话話]|\d{1,3}(?:v\d+)?|'
+      r'\d{1,3}\s*[-~～–]\s*\d{1,3}|(?:480|720|1080|2160|4320)[pi]|[248]K|'
+      r'BD(?:Rip|MV)?|WEB(?:-DL|Rip)?|TVRip|HEVC|AVC|H\.?26[45]|x26[45]|'
+      r'MP4|MKV|简(?:繁)?(?:日)?(?:内封|外挂)?|繁(?:日)?(?:内封|外挂)?|'
+      r'CHS|CHT|JPN|GB|BIG5)$',
+      caseSensitive: false,
+    ).hasMatch(label);
+  }
+
+  static bool _isGroupLabel(String label) {
+    if (_knownGroups.contains(label.toLowerCase()) ||
+        RegExp(
+          r'(字幕组|汉化组|製作組|制作组|压制组|压制|合成)$',
+        ).hasMatch(label)) {
+      return true;
+    }
+    // Unadorned Latin words can also be series names (e.g. [Naruto]).
+    // Accept unfamiliar handles only when they carry a source-like cue.
+    return (RegExp(r'^[A-Za-z][A-Za-z0-9._&\u4e00-\u9fff-]{2,39}$')
+                .hasMatch(label) &&
+            (RegExp(r'[0-9._&\u4e00-\u9fff-]').hasMatch(label) ||
+                RegExp(r'(?:Sub|Group|Raws|ACG)$', caseSensitive: false)
+                    .hasMatch(label)) ||
+            RegExp(r'^\d[⁰¹²³⁴⁵⁶⁷⁸⁹]*ACG$', caseSensitive: false)
+                .hasMatch(label)) &&
+        !RegExp(
+          r'^(?:Anime|Movie|OVA|OAD|Special|Complete|Batch|Sub|Subtitle|RAW|Raws|AAC|FLAC|GB|BIG5)$',
+          caseSensitive: false,
+        ).hasMatch(label);
+  }
+
+  static String? extractQualityHint(String title) {
+    final match = RegExp(
+      r'(?<!\d)(?:4320|2160|1080|720|480)[pi](?!\w)|(?<!\w)[248]K(?!\w)',
+      caseSensitive: false,
+    ).firstMatch(title);
+    return match?.group(0);
+  }
+
   /// Only recognises explicit episode markers or isolated numeric groups.
   /// Ranges, batches, and ambiguous multi-episode titles require manual choice.
   static int? extractEpisode(String title) {
-    if (RegExp(r'(?<!\d)\d{1,3}\s*[-~～–]\s*\d{1,3}(?!\d)').hasMatch(title)) {
+    if (RegExp(
+          r'剧场版|劇場版|电影|電影|Movie|合集|全集|Batch|Complete',
+          caseSensitive: false,
+        ).hasMatch(title) ||
+        RegExp(r'(?<!\d)\d{1,3}\s*[-~～–]\s*\d{1,3}(?!\d)')
+            .hasMatch(title)) {
       return null;
     }
     final matches = <int>{};

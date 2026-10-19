@@ -122,36 +122,3 @@ class AboutLinkTile extends StatelessWidget {
     );
   }
 }
-
-class CheckUpdateButton extends StatefulWidget {
-  const CheckUpdateButton({super.key, required this.onCheckUpdate});
-
-  final Future<bool> Function() onCheckUpdate;
-
-  @override
-  State<CheckUpdateButton> createState() => _CheckUpdateButtonState();
-}
-
-class _CheckUpdateButtonState extends State<CheckUpdateButton> {
-  bool _checking = false;
-
-  Future<void> _check() async {
-    if (_checking) return;
-    setState(() => _checking = true);
-    try {
-      await widget.onCheckUpdate();
-    } catch (_) {
-      if (mounted) _showMessage(context, '检查更新失败，请稍后重试');
-    } finally {
-      if (mounted) setState(() => _checking = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => StateActionButton(
-        onPressed: _checking ? null : _check,
-        text: _checking ? '正在检查…' : '检查更新',
-        reserveText: '正在检查…',
-        icon: Icons.update_rounded,
-      );
-}

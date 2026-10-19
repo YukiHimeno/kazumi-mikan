@@ -6,6 +6,7 @@ import 'package:kazumi/bean/settings/settings_list.dart';
 import 'package:kazumi/bean/widget/state_presentation.dart';
 import 'package:kazumi/bean/widget/tonal_card.dart';
 import 'package:kazumi/modules/bangumi/sync_priority.dart';
+import 'package:kazumi/request/config/api_endpoints.dart';
 import 'package:kazumi/pages/settings/sync/sync_settings_widgets.dart';
 import 'package:kazumi/services/storage/storage.dart';
 import 'package:kazumi/services/sync/bangumi_sync_service.dart';
@@ -92,18 +93,18 @@ class _BangumiSyncPageState extends State<BangumiSyncPage> {
     }
   }
 
-  Future<void> _getToken() async {
+  Future<void> _openHelp(String url) async {
     bool opened;
     try {
       opened = await launchUrl(
-        Uri.parse('https://next.bgm.tv/demo/access-token'),
+        Uri.parse(url),
         mode: LaunchMode.externalApplication,
       );
     } catch (_) {
       opened = false;
     }
     if (!opened && mounted) {
-      setState(() => _tokenError = '无法打开浏览器，请稍后重试');
+      setState(() => _tokenError = '无法打开浏览器，请手动访问：$url');
     }
   }
 
@@ -314,6 +315,12 @@ class _BangumiSyncPageState extends State<BangumiSyncPage> {
                   : '使用 Access Token 授权'),
           children: [
             const SizedBox(height: 12),
+            const Text('1. 登录 Bangumi 官网，在个人 Access Token 页面生成令牌。\n'
+                '2. 复制令牌粘贴到下方，仅用于连接和同步；点击「验证并保存」后将通过官方 api.bgm.tv/v0/me 核验。'),
+            const SizedBox(height: 8),
+            const Text('安全提示：令牌会保存在本机现有 Hive 设置中，未加密；请勿在共享设备上使用或分享令牌。',
+                style: TextStyle(fontSize: 12)),
+            const SizedBox(height: 16),
             TextField(
               controller: _tokenController,
               enabled: !_busy,
@@ -350,9 +357,18 @@ class _BangumiSyncPageState extends State<BangumiSyncPage> {
               runSpacing: 8,
               children: [
                 TextButton.icon(
-                  onPressed: _busy ? null : _getToken,
+                  onPressed: _busy
+                      ? null
+                      : () => _openHelp(ApiEndpoints.bangumiPatUrl),
                   icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                  label: const Text('获取授权码'),
+                  label: const Text('前往官网生成令牌'),
+                ),
+                TextButton.icon(
+                  onPressed: _busy
+                      ? null
+                      : () => _openHelp(ApiEndpoints.bangumiAuthDocsUrl),
+                  icon: const Icon(Icons.help_outline_rounded, size: 18),
+                  label: const Text('官方授权文档'),
                 ),
                 StateActionButton.tonal(
                   onPressed: _busy ? null : _saveToken,

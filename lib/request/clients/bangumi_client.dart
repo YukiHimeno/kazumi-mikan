@@ -27,6 +27,8 @@ class BangumiClient {
         url,
         queryParameters: queryParameters,
         options: Options(
+          followRedirects: !requiresAuth,
+          extra: {'bangumiRequiresAuth': requiresAuth},
           headers: _headers(
             requiresAuth: requiresAuth,
             accessToken: accessToken,
@@ -55,6 +57,8 @@ class BangumiClient {
         data: data,
         queryParameters: queryParameters,
         options: Options(
+          followRedirects: !requiresAuth,
+          extra: {'bangumiRequiresAuth': requiresAuth},
           headers: _headers(
             requiresAuth: requiresAuth,
             url: url,
@@ -78,15 +82,18 @@ class BangumiClient {
     Object? data,
   }) {
     final headers = <String, dynamic>{...bangumiHTTPHeader};
-    final bangumiSyncEnable = GStorage.getSetting(
-      SettingsKeys.bangumiSyncEnable,
-    );
-    final token =
-        (accessToken ??
-                GStorage.getSetting<String>(SettingsKeys.bangumiAccessToken))
-            .trim();
-    if ((requiresAuth || bangumiSyncEnable) && token.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $token';
+    if (requiresAuth) {
+      final uri = Uri.parse(url);
+      if (uri.scheme != 'https' || uri.host != 'api.bgm.tv') {
+        throw ArgumentError(
+          'Bangumi authentication requires official HTTPS API',
+        );
+      }
+      final token =
+          (accessToken ??
+                  GStorage.getSetting<String>(SettingsKeys.bangumiAccessToken))
+              .trim();
+      if (token.isNotEmpty) headers['Authorization'] = 'Bearer $token';
     }
     if (_shouldSignProtectedMirrorRequest(url, method)) {
       final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;

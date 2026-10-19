@@ -108,7 +108,8 @@ class NetworkConfig {
       sendTimeout: sendTimeout,
       proxyHost: parsed.$1,
       proxyPort: parsed.$2,
-      allowBadCertificates: true,
+      // A proxy must not silently disable TLS verification for PAT requests.
+      allowBadCertificates: false,
     );
   }
 }

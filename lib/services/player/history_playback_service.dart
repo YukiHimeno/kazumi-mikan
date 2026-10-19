@@ -5,6 +5,7 @@ import 'package:kazumi/pages/video/video_playback_args.dart';
 import 'package:kazumi/plugins/plugins.dart';
 import 'package:kazumi/plugins/plugins_controller.dart';
 import 'package:kazumi/services/logging/logger.dart';
+import 'package:kazumi/services/mikan/mikan_service.dart';
 import 'package:kazumi/services/plugin/rule_engine_models.dart'
     show RuleCancelToken;
 
@@ -55,16 +56,16 @@ class HistoryPlaybackService {
           !uri.path.toLowerCase().endsWith('.torrent')) {
         return const HistoryPlaybackUnavailable('旧的 BT 发布链接不可用，请重新搜索');
       }
+      final releaseTitle = history.lastWatchEpisodeName.isEmpty
+          ? '蜜柑发布'
+          : history.lastWatchEpisodeName;
       return HistoryPlaybackReady(
         MikanVideoPlaybackArgs(
           bangumiItem: history.bangumiItem,
-          titles: [
-            history.lastWatchEpisodeName.isEmpty
-                ? '蜜柑发布'
-                : history.lastWatchEpisodeName,
-          ],
+          titles: [releaseTitle],
           torrentUrls: [uri.toString()],
           selectedIndex: 0,
+          sourceGroup: MikanService.extractSourceGroup(releaseTitle),
         ),
       );
     }
