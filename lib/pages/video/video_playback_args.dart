@@ -27,6 +27,20 @@ class OnlineVideoPlaybackArgs extends VideoPlaybackArgs {
   final List<Road> roads;
 }
 
+/// An explicit Mikan release selection; release order is not a Bangumi episode number.
+class MikanVideoPlaybackArgs extends VideoPlaybackArgs {
+  const MikanVideoPlaybackArgs({
+    required super.bangumiItem,
+    required this.titles,
+    required this.torrentUrls,
+    required this.selectedIndex,
+  });
+
+  final List<String> titles;
+  final List<String> torrentUrls;
+  final int selectedIndex;
+}
+
 class OfflineVideoPlaybackArgs extends VideoPlaybackArgs {
   const OfflineVideoPlaybackArgs({
     required super.bangumiItem,

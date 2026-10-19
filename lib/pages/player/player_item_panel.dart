@@ -909,7 +909,7 @@ class _PlayerItemPanelState extends State<PlayerItemPanel> {
                     SubmenuButton(
                         menuChildren: _superResolutionItems,
                         child: const Text('超分辨率')),
-                    _syncPlayMenuItem,
+                    if (!videoPageController.isMikanMode) _syncPlayMenuItem,
                   ],
                   KazumiMenuItem(
                     onPressed: widget.showDanmakuSwitch,
@@ -920,13 +920,14 @@ class _PlayerItemPanelState extends State<PlayerItemPanel> {
                     onPressed: widget.showVideoInfo,
                     label: '视频详情',
                   ),
-                  KazumiMenuItem(
+                  if (!videoPageController.isMikanMode)
+                    KazumiMenuItem(
                     onPressed: () {
                       final needRestart = playerController.playback.playing;
                       playerController.pause();
                       RemotePlay()
                           .castVideo(playerController.videoUrl,
-                              videoPageController.currentPlugin.referer)
+                              videoPageController.sourceReferer)
                           .whenComplete(() {
                         if (mounted && needRestart) {
                           playerController.play();
@@ -978,7 +979,8 @@ class _PlayerItemPanelState extends State<PlayerItemPanel> {
                       ),
                     ),
                   ),
-                  if (!compact) _syncPlayMenuItem,
+                  if (!compact && !videoPageController.isMikanMode)
+                    _syncPlayMenuItem,
                 ],
               ),
             ],

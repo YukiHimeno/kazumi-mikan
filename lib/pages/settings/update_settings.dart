@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:kazumi/bean/settings/settings_detail_scaffold.dart';
@@ -33,7 +35,8 @@ class _UpdateSettingsPageState extends State<UpdateSettingsPage> {
                     GStorage.putSetting(SettingsKeys.autoUpdate, _autoUpdate);
                   },
                 ),
-                SettingsTile.switchTile(
+                if (!Platform.isAndroid)
+                  SettingsTile.switchTile(
                   leading: Icons.extension_rounded,
                   title: const Text('规则更新'),
                   initialValue: _pluginUpdate,

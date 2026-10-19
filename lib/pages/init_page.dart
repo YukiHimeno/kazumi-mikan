@@ -71,13 +71,14 @@ class _InitPageState extends State<InitPage> {
 
     await _checkRunningOnX11();
     await _showShortcutDialog();
-    await _pluginInit();
+    if (!Platform.isAndroid) await _pluginInit();
 
     if (!mounted) {
       return;
     }
     // Installs that predate the flag already have rules; don't re-onboard them.
-    if (!GStorage.getSetting(SettingsKeys.onboardingCompleted) &&
+    if (!Platform.isAndroid &&
+        !GStorage.getSetting(SettingsKeys.onboardingCompleted) &&
         pluginsController.pluginList.isEmpty) {
       context.navigate('/onboarding');
       return;

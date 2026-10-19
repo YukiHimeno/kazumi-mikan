@@ -19,6 +19,7 @@ dependencies:
   dio: ^5.11.0
   cookie_jar: ^4.0.9
   crypto: ^3.0.6
+  flutter_go_torrent_streamer: 0.0.8
   connectivity_plus: ^6.0.5
 
   path_provider: ^2.1.5
@@ -28,6 +29,7 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   ech_http: ^0.2.2
   http: ^1.6.0
+  xml: ^6.6.1
   image: ^4.8.0
   file_picker: ^10.3.7
 

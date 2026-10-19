@@ -163,9 +163,12 @@ class _VideoPageState extends State<VideoPage>
   void _initOnlineMode() {
     videoPageController.historyOffset = 0;
 
-    var progress = historyController.lastWatching(
-        videoPageController.bangumiItem,
-        videoPageController.currentPlugin.name);
+    var progress = videoPageController.isMikanMode
+        ? null
+        : historyController.lastWatching(
+            videoPageController.bangumiItem,
+            videoPageController.sourceName,
+          );
     if (progress != null) {
       if (videoPageController.roadList.length > progress.road) {
         if (videoPageController.roadList[progress.road].data.length >=
@@ -378,7 +381,9 @@ class _VideoPageState extends State<VideoPage>
                           const SizedBox(height: 10),
                           Text(
                             videoPageController.loading
-                                ? '视频资源解析中'
+                                ? (videoPageController.isMikanMode
+                                    ? '正在连接 BT 并获取种子元数据…'
+                                    : '视频资源解析中')
                                 : '视频资源解析成功, 播放器加载中',
                             style: const TextStyle(color: Colors.white),
                           ),
@@ -485,10 +490,11 @@ class _VideoPageState extends State<VideoPage>
 
   Widget get episodePanel => Observer(builder: (context) {
         final downloads = <String, DownloadEpisode>{};
-        if (!videoPageController.isOfflineMode) {
+        if (!videoPageController.isOfflineMode &&
+            !videoPageController.isMikanMode) {
           for (final record in downloadController.records) {
             if (record.bangumiId != videoPageController.bangumiItem.id ||
-                record.pluginName != videoPageController.currentPlugin.name) {
+                record.pluginName != videoPageController.sourceName) {
               continue;
             }
             for (final episode in record.episodes.values) {
@@ -526,7 +532,9 @@ class _VideoPageState extends State<VideoPage>
             _closeSidePanel();
             changeEpisode(episode, currentRoad: road);
           },
-          onDownload: (road) => showAdaptiveBottomSheet<void>(
+          onDownload: videoPageController.isMikanMode
+              ? null
+              : (road) => showAdaptiveBottomSheet<void>(
             context: context,
             builder: (context) => DownloadEpisodeSheet(
               road: road,

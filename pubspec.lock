@@ -521,6 +521,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.2.2"
+  flutter_go_torrent_streamer:
+    dependency: "direct main"
+    description:
+      name: flutter_go_torrent_streamer
+      sha256: "38f44e744a9b7e8bb37addb0d42558a25abe1056d6b6e31fb91e6d4cb5d6fd33"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.8"
   flutter_inappwebview_android:
     dependency: "direct main"
     description:
@@ -1873,7 +1881,7 @@ packages:
     source: hosted
     version: "1.1.0"
   xml:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: xml
       sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"

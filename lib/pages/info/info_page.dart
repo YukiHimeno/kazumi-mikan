@@ -19,6 +19,7 @@ import 'package:kazumi/pages/info/info_controller.dart';
 import 'package:kazumi/pages/info/info_tabview.dart';
 import 'package:kazumi/pages/info/rating_review_dialog.dart';
 import 'package:kazumi/pages/info/source_sheet.dart';
+import 'package:kazumi/pages/info/mikan_release_sheet.dart';
 import 'package:kazumi/plugins/plugins_controller.dart';
 import 'package:kazumi/services/logging/logger.dart';
 import 'package:kazumi/services/platform/desktop_window_config.dart';
@@ -301,6 +302,14 @@ class _InfoPageState extends State<InfoPage>
   }
 
   void _startWatching() {
+    if (Platform.isAndroid) {
+      showAdaptiveBottomSheet<void>(
+        context: context,
+        maxHeightFactor: 0.88,
+        builder: (_) => MikanReleaseSheet(bangumi: infoController.bangumiItem),
+      );
+      return;
+    }
     if (widget.pluginsController.pluginList.isEmpty) {
       KazumiDialog.showToast(
         message: '还没有规则，无法开始观看',

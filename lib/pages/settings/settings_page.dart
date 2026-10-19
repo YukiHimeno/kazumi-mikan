@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
@@ -326,7 +328,8 @@ class _SettingsMenu extends StatelessWidget {
                 child: SectionHeader(title: Text(group.title)),
               ),
               for (final category in group.categories)
-                _RailDestination(
+                if (!Platform.isAndroid || category.path != '/settings/plugin')
+                  _RailDestination(
                   category: category,
                   selected: selectedPath == category.path,
                   onTap: () => onSelect(category.path),
@@ -338,7 +341,9 @@ class _SettingsMenu extends StatelessWidget {
                   title: group.title,
                   children: [
                     for (final category in group.categories)
-                      SettingsCategoryTile(
+                      if (!Platform.isAndroid ||
+                          category.path != '/settings/plugin')
+                        SettingsCategoryTile(
                         icon: category.icon,
                         title: category.label,
                         description: category.description,

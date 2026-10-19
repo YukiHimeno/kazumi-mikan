@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:kazumi/bean/settings/settings_list.dart';
 import 'package:kazumi/bean/widget/content_section.dart';
@@ -78,7 +80,16 @@ class _WideSpaceLayout extends StatelessWidget {
         ),
         const SizedBox(height: 28),
         _AdaptivePair(
-          first: _RulesTile(onTap: () => onOpen(MyDestination.rules)),
+          first: Platform.isAndroid
+              ? _ToolTile(
+                  icon: Icons.rss_feed_rounded,
+                  title: '蜜柑计划',
+                  caption: '在番剧详情页选择 BT 发布版本',
+                  color: colors.primaryContainer,
+                  foreground: colors.onPrimaryContainer,
+                  onTap: () => onOpen(MyDestination.history),
+                )
+              : _RulesTile(onTap: () => onOpen(MyDestination.rules)),
           second: _AdaptivePair(
             first: _ToolTile(
               icon: Icons.history_rounded,
@@ -197,7 +208,8 @@ class _CompactSpaceLayout extends StatelessWidget {
         ContentSection.group(
           title: '内容与偏好',
           children: [
-            _entry('规则设置', Icons.extension_rounded, MyDestination.rules),
+            if (!Platform.isAndroid)
+              _entry('规则设置', Icons.extension_rounded, MyDestination.rules),
             _entry('外观设置', Icons.palette_rounded, MyDestination.theme),
             _entry('播放设置', Icons.play_circle_rounded, MyDestination.player),
             _entry('弹幕设置', Icons.subtitles_rounded, MyDestination.danmaku),

@@ -48,6 +48,26 @@ class HistoryPlaybackService {
           : HistoryPlaybackReady(args);
     }
 
+    if (history.adapterName == '蜜柑计划') {
+      final uri = Uri.tryParse(history.episodePageUrl);
+      if (uri == null ||
+          (uri.scheme != 'https' && uri.scheme != 'http') ||
+          !uri.path.toLowerCase().endsWith('.torrent')) {
+        return const HistoryPlaybackUnavailable('旧的 BT 发布链接不可用，请重新搜索');
+      }
+      return HistoryPlaybackReady(
+        MikanVideoPlaybackArgs(
+          bangumiItem: history.bangumiItem,
+          titles: [
+            history.lastWatchEpisodeName.isEmpty
+                ? '蜜柑发布'
+                : history.lastWatchEpisodeName,
+          ],
+          torrentUrls: [uri.toString()],
+          selectedIndex: 0,
+        ),
+      );
+    }
     final args = await _onlineArgs(history, cancelToken);
     return args == null
         ? const HistoryPlaybackUnavailable('在线源不可用，请重新选择播放源')

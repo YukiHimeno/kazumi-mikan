@@ -646,9 +646,7 @@ class _PlayerItemState extends State<PlayerItem>
           mediaId:
               '${videoPageController.bangumiItem.id}_${currentRoad}_$currentEpisode',
           title: bangumiTitle,
-          album: videoPageController.isOfflineMode
-              ? videoPageController.offlinePluginName
-              : videoPageController.currentPlugin.name,
+          album: videoPageController.sourceName,
           artist: episodeRef.displayTitle,
           duration: playerController.playback.duration,
           playing: playerController.playback.playing,

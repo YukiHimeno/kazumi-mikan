@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"><channel>
+  <title>Mikan Project - 搜索结果:葬送的芙莉莲</title>
+  <item>
+    <guid isPermaLink="false">[字幕组] 葬送的芙莉莲 第03话</guid>
+    <link>https://mikanani.me/Home/Episode/aaa</link>
+    <title><![CDATA[[字幕组] 葬送的芙莉莲 第03话 & 1080p]]></title>
+    <torrent xmlns="https://mikanani.me/0.1/"><link>https://mikanani.me/Home/Episode/aaa</link></torrent>
+    <enclosure type="application/x-bittorrent" length="12345" url="https://mikanani.me/Download/20240101/aaa.torrent" />
+  </item>
+  <item>
+    <guid isPermaLink="false">[字幕组] 葬送的芙莉莲 第03话</guid>
+    <enclosure type="application/x-bittorrent" url="https://mikanani.me/Download/20240101/aaa.torrent" />
+  </item>
+  <item>
+    <guid isPermaLink="false">[字幕组] 葬送的芙莉莲 [01-12] BDRip 1080p</guid>
+    <enclosure type="application/x-bittorrent" url="https://mikanani.me/Download/20240102/bbb.torrent" />
+  </item>
+  <item><title>Only episode page</title><link>https://mikanani.me/Home/Episode/ccc</link></item>
+</channel></rss>
