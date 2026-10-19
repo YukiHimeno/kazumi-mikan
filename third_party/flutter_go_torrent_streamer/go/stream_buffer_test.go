@@ -77,6 +77,19 @@ func TestStreamRangeOffset(t *testing.T) {
 	}
 }
 
+func TestRequestStreamReaderHonorsCancellation(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	reader := requestStreamReader{
+		Reader: &fakeStreamReader{data: []byte("buffered data")},
+		ctx:    ctx,
+	}
+	buffer := make([]byte, 4)
+	if _, err := reader.Read(buffer); err != context.Canceled {
+		t.Fatalf("Read error = %v, want context.Canceled", err)
+	}
+}
+
 func TestWarmStreamReaderRestoresRequestedOffset(t *testing.T) {
 	data := make([]byte, streamPrebufferBytes+128)
 	reader := &fakeStreamReader{data: data}

@@ -792,7 +792,8 @@ func (s *StreamerSession) streamHandler(w http.ResponseWriter, r *http.Request) 
 
 	fileToStream.Download()
 	reader := fileToStream.NewReader()
-	reader.SetResponsive()
+	// The default reader waits for complete, hash-verified pieces. Avoid
+	// responsive partial-piece reads so corrupt/unverified bytes never reach the player.
 	reader.SetReadahead(8 * 1024 * 1024)
 	defer reader.Close()
 
@@ -804,7 +805,13 @@ func (s *StreamerSession) streamHandler(w http.ResponseWriter, r *http.Request) 
 			warmStreamReader(r, reader, offset, fileToStream.Length())
 		}
 	}
-	http.ServeContent(w, r, fileToStream.Path(), time.Now(), reader)
+	http.ServeContent(
+		w,
+		r,
+		fileToStream.Path(),
+		time.Now(),
+		requestStreamReader{Reader: reader, ctx: r.Context()},
+	)
 }
 
 // A torrent: prefix passes base64-encoded metainfo without losing private or tracker data.

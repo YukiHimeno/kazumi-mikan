@@ -15,6 +15,15 @@ const (
 	streamPrebufferWait  = 5 * time.Second
 )
 
+type requestStreamReader struct {
+	torrent.Reader
+	ctx context.Context
+}
+
+func (r requestStreamReader) Read(p []byte) (int, error) {
+	return r.Reader.ReadContext(r.ctx, p)
+}
+
 func streamRangeOffset(header string, fileLength int64) (int64, bool) {
 	if header == "" {
 		return 0, fileLength > 0

@@ -97,6 +97,15 @@ void main() {
     expect(release.audioCodec, 'AAC');
     expect(release.subtitleHint, '简繁日');
     expect(release.container, 'MKV');
+    expect(release.matchesGroupQuery('newcrew'), isTrue);
+    expect(release.matchesGroupQuery('a group not present'), isFalse);
+
+    final unfamiliarGroup = MikanService.parseRss('''<rss><channel><item>
+      <title>[Unlisted / Team 2027] [Some Anime] EP05 720p</title>
+      <enclosure url="https://mikanani.me/Download/unlisted.torrent" />
+    </item></channel></rss>''').single;
+    expect(unfamiliarGroup.sourceGroup, 'Unlisted / Team 2027');
+    expect(unfamiliarGroup.matchesGroupQuery('unlisted / team'), isTrue);
 
     final batch = MikanService.parseRss('''<rss><channel><item>
       <title>[RawWorks] 某番剧 S02 [01-12] BDRip x265 10bit FLAC MKV</title>

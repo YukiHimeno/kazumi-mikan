@@ -19,8 +19,8 @@ class _MikanReleaseSheetState extends State<MikanReleaseSheet> {
   final MikanService _service = MikanService();
   final TextEditingController _query = TextEditingController();
   final TextEditingController _episodeFilter = TextEditingController();
+  final TextEditingController _groupFilter = TextEditingController();
   List<MikanRelease> _releases = [];
-  String? _groupFilter;
   String? _error;
   bool _loading = false;
   int _request = 0;
@@ -43,7 +43,7 @@ class _MikanReleaseSheetState extends State<MikanReleaseSheet> {
       _error = null;
       _releases = [];
       _episodeFilter.clear();
-      _groupFilter = null;
+      _groupFilter.clear();
     });
     try {
       final releases = await _service.search(query);
@@ -60,6 +60,7 @@ class _MikanReleaseSheetState extends State<MikanReleaseSheet> {
     ++_request;
     _query.dispose();
     _episodeFilter.dispose();
+    _groupFilter.dispose();
     _service.close();
     super.dispose();
   }
@@ -79,8 +80,9 @@ class _MikanReleaseSheetState extends State<MikanReleaseSheet> {
 
   List<MikanRelease> get _filteredReleases {
     final episode = int.tryParse(_episodeFilter.text.trim());
+    final groupQuery = _groupFilter.text.trim().toLowerCase();
     return _releases.where((release) {
-      if (_groupFilter != null && release.sourceGroup != _groupFilter) {
+      if (groupQuery.isNotEmpty && !release.matchesGroupQuery(groupQuery)) {
         return false;
       }
       if (episode != null && !release.matchesEpisode(episode)) {
@@ -134,33 +136,26 @@ class _MikanReleaseSheetState extends State<MikanReleaseSheet> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                PopupMenuButton<String>(
-                  tooltip: '按字幕组筛选',
-                  onSelected: (value) => setState(() {
-                    _groupFilter = value == '__all__' ? null : value;
-                  }),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(value: '__all__', child: Text('全部字幕组')),
-                    ...(_releases
-                            .map((release) => release.sourceGroup)
-                            .toSet()
-                            .toList()
-                          ..sort())
-                        .map(
-                          (group) =>
-                              PopupMenuItem(value: group, child: Text(group)),
-                        ),
-                  ],
-                  child: SizedBox(
-                    width: 142,
-                    child: Chip(
-                      avatar: const Icon(Icons.groups_outlined, size: 18),
-                      label: Text(
-                        _groupFilter ?? '全部字幕组',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                Expanded(
+                  child: TextField(
+                    controller: _groupFilter,
+                    decoration: InputDecoration(
+                      labelText: '字幕组/标题筛选',
+                      hintText: '可输入任意组名',
+                      prefixIcon: const Icon(Icons.groups_outlined),
+                      suffixIcon: _groupFilter.text.isEmpty
+                          ? null
+                          : IconButton(
+                              tooltip: '清除字幕组筛选',
+                              onPressed: () {
+                                _groupFilter.clear();
+                                setState(() {});
+                              },
+                              icon: const Icon(Icons.clear),
+                            ),
+                      isDense: true,
                     ),
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
               ],

@@ -45,6 +45,15 @@ class MikanRelease {
           episodeEnd != null &&
           number >= episodeStart! &&
           number <= episodeEnd!);
+
+  /// Group filtering stays open-ended: the full title remains searchable when
+  /// a new or ambiguous group label cannot be confidently parsed.
+  bool matchesGroupQuery(String query) {
+    final needle = query.trim().toLowerCase();
+    return needle.isEmpty ||
+        sourceGroup.toLowerCase().contains(needle) ||
+        title.toLowerCase().contains(needle);
+  }
 }
 
 class _ParsedRelease {
