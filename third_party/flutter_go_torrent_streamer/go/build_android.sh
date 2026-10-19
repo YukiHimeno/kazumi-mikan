@@ -28,7 +28,7 @@ for target in arm64-v8a:arm64:aarch64 x86_64:amd64:x86_64; do
   }
   env GOOS=android GOARCH="$arch" CGO_ENABLED=1 CC="$cc" CXX="$cxx" \
     go build -x -trimpath -buildmode=c-shared -o "$out/$abi/libtorrent_streamer.so" .
-  cxx_runtime="$ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$triple/libc++_shared.so"
+  cxx_runtime="$ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/${triple}-linux-android/libc++_shared.so"
   [[ -f "$cxx_runtime" ]] || {
     echo "Missing Android C++ runtime: $cxx_runtime" >&2
     exit 1
